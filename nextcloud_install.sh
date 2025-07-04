@@ -1,14 +1,21 @@
 #!/bin/bash
 set -e
-cd ~
+
+# entra no diretório do script (para suportar git clone)
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Garante .gitignore
+if ! grep -qx "app-data/" .gitignore 2>/dev/null; then
+  echo -e "\n# Ignorar dados do Nextcloud\napp-data/" >> .gitignore
+  echo "🗒️  Atualizado .gitignore para excluir app-data/"
+fi
 
 # Quem chamou o sudo
 TARGET_USER="${SUDO_USER:-$USER}"
-HOME_DIR="/home/$TARGET_USER"
 
-# Pastas
-STACK_DIR="$HOME_DIR/app-data/nextcloud-stack"
-APP_DATA="$HOME_DIR/app-data/nextcloud"
+# Pastas agora relativas ao projeto
+STACK_DIR="$(pwd)"                  # docker-compose.yml ficará aqui
+APP_DATA="$STACK_DIR/app-data"     # dados do Nextcloud em ./app-data
 PORT=8443
 
 # Exigir root
@@ -92,7 +99,7 @@ install_openssl_if_needed() {
 
 # ---------- Instala o stack ----------
 install_nextcloud_stack() {
-  mkdir -p "$STACK_DIR" "$APP_DATA/nginx/certs"
+  mkdir -p "$APP_DATA/nginx/certs" "$APP_DATA/nginx" "$APP_DATA"
 
   CERT="$APP_DATA/nginx/certs/selfsigned.crt"
   KEY="$APP_DATA/nginx/certs/selfsigned.key"
@@ -102,8 +109,8 @@ install_nextcloud_stack() {
       -keyout "$KEY" -out "$CERT" -subj "/CN=nextcloud"
   fi
 
-  # nginx.conf (sem recuo!)
-  cat >"$STACK_DIR/nginx.conf" <<'EOF'
+  # nginx.conf
+  cat >"$APP_DATA/nginx/nginx.conf" <<'EOF'
 events {}
 http {
   server {
@@ -124,8 +131,8 @@ http {
 }
 EOF
 
-  # docker-compose.yml (sem recuo!)
-  cat >"$STACK_DIR/docker-compose.yml" <<EOF
+  # docker-compose.yml
+  cat >"$APP_DATA/docker-compose.yml" <<EOF
 services:
   nextcloud:
     image: nextcloud:latest
@@ -173,13 +180,13 @@ services:
       - "${PORT}:443"
     volumes:
       - ${APP_DATA}/nginx/certs:/certs
-      - $STACK_DIR/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $APP_DATA/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - nextcloud
 EOF
 
   echo "🚀 Subindo o stack..."
-  cd "$STACK_DIR"
+  cd "$APP_DATA"
   docker compose up -d
 
   # --- Ajusta trusted_domains e overwrite* ---

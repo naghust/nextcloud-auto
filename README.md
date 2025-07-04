@@ -1,6 +1,6 @@
 # Nextcloud Auto-Deploy (Docker + Tailscale)
 
-Instalador 100 % automatizado que põe um Nextcloud rodando em **1 comando**, dentro
+Instalador 100 % automatizado que põe um Nextcloud rodando em poucos comandos, dentro
 de contêineres Docker, protegido por HTTPS (autoassinado) e acessível pela
 Tailnet. Nada de gambiarra no host — só pacotes essenciais e diretórios de dados.
 
@@ -16,7 +16,7 @@ Tailnet. Nada de gambiarra no host — só pacotes essenciais e diretórios de d
    - OpenSSL  
    (se já tiver, ele só avisa — não reinstala)
 
-2. **Gera** certificado autoassinado (`~/app-data/nextcloud/nginx/certs`).
+2. **Gera** certificado autoassinado (`~/nextcloud-auto/app-data/nginx/certs`).
 
 3. **Cria e sobe** via `docker-compose`:  
    | Contêiner | Porta interna | Descrição |
@@ -33,7 +33,7 @@ Tailnet. Nada de gambiarra no host — só pacotes essenciais e diretórios de d
    - `overwritehost`, `overwriteprotocol`, `overwrite.cli.url`  
    Assim a URL não perde `:8443` e não aparece o aviso “contacte seu administrador”.
 
-6. **Deixa tudo isolado** em `~/app-data/nextcloud*`; nada é instalado fora de
+6. **Deixa tudo isolado** em `~/nextcloud-auto/app-data*`; nada é instalado fora de
    contêineres, exceto os pacotes de pré-requisito.
 
 ---
@@ -41,4 +41,7 @@ Tailnet. Nada de gambiarra no host — só pacotes essenciais e diretórios de d
 ## Uso rápido
 
 ```bash
+git clone https://github.com/naghust/nextcloud-auto.git
+cd nextcloud-auto/
+sudo chmod +x nextcloud_install.sh
 sudo ./nextcloud_install.sh
