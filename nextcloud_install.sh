@@ -4,12 +4,6 @@ set -e
 # entra no diretório do script (para suportar git clone)
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Garante .gitignore
-if ! grep -qx "app-data/" .gitignore 2>/dev/null; then
-  echo -e "\n# Ignorar dados do Nextcloud\napp-data/" >> .gitignore
-  echo "🗒️  Atualizado .gitignore para excluir app-data/"
-fi
-
 # Quem chamou o sudo
 TARGET_USER="${SUDO_USER:-$USER}"
 
