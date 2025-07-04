@@ -43,5 +43,4 @@ Tailnet. Nada de gambiarra no host — só pacotes essenciais e diretórios de d
 ```bash
 git clone https://github.com/naghust/nextcloud-auto.git
 cd nextcloud-auto/
-sudo chmod +x nextcloud_install.sh
 sudo ./nextcloud_install.sh
